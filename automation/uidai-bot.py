@@ -10,7 +10,7 @@ service = Service('./chromedriver-win64/chromedriver.exe')
 driver = webdriver.Chrome(service=service)
 
 # Navigate to the UIDAI website
-driver.get('https://uidai.gov.in')
+driver.get('https://uidai-new.vercel.app')
 
 # Initialize ActionChains for capturing mouse movements and keystrokes
 actions = ActionChains(driver)
