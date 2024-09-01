@@ -1,18 +1,95 @@
 'use client'
 // src/app/download/page.js or src/pages/download.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import Image from 'next/image';
-import styles from './download.module.css'; // Assuming the CSS module for this component
+import styles from './download.module.css';
+// Assuming the CSS module for this component
 
-const Download = () => {
-  const [showOtp, setShowOtp] = useState(false);
+const InteractionCapture = () => {
+    const [interactionData, setInteractionData] = useState({
+      mouseMovements: [],
+      keystrokes: [],
+      scrollingPatterns: [],
+      ipAddress: '',
+    });
+  
+    useEffect(() => {
+      // Capture mouse movements
+      const handleMouseMove = (event) => {
+        setInteractionData((prevState) => ({
+          ...prevState,
+          mouseMovements: [
+            ...prevState.mouseMovements,
+            { x: event.clientX, y: event.clientY, timestamp: Date.now() },
+          ],
+        }));
+      };
+  
+      // Capture keystrokes
+      const handleKeyDown = (event) => {
+        setInteractionData((prevState) => ({
+          ...prevState,
+          keystrokes: [
+            ...prevState.keystrokes,
+            { key: event.key, timestamp: Date.now() },
+          ],
+        }));
+      };
+  
+      // Capture scrolling patterns
+      const handleScroll = () => {
+        setInteractionData((prevState) => ({
+          ...prevState,
+          scrollingPatterns: [
+            ...prevState.scrollingPatterns,
+            { scrollY: window.scrollY, timestamp: Date.now() },
+          ],
+        }));
+      };
+  
+      // Add event listeners
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('keydown', handleKeyDown);
+      window.addEventListener('scroll', handleScroll);
+  
+      // Get client IP address
+      axios.get('https://api.ipify.org?format=json').then((response) => {
+        setInteractionData((prevState) => ({
+          ...prevState,
+          ipAddress: response.data.ip,
+        }));
+      });
+  
+      // Cleanup function to remove event listeners
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+        window.removeEventListener('keydown', handleKeyDown);
+        window.removeEventListener('scroll', handleScroll);
+      };
+    }, []);
+  
+    useEffect(() => {
+      // Print interaction data to the console for debugging
+      console.log(interactionData);
+  
+      // Store the interaction data in a database via an API call
+      axios.post('/api/store-interactions', interactionData)
+        .then((response) => {
+          console.log('Data stored successfully:', response.data);
+        })
+        .catch((error) => {
+          console.error('Error storing data:', error);
+        });
+    }, [interactionData]);
+    const [showOtp, setShowOtp] = useState(false);
 
   const showOtpSection = () => {
     setShowOtp(true);
   };
 
   return (
-    <div>
+    <div className='interaction-page'>
       <header className={styles.header}>
         <div className={styles.titleSection}>
         </div>
@@ -89,5 +166,6 @@ const Download = () => {
     </div>
   );
 };
+  
 
-export default Download;
+export default InteractionCapture;;
