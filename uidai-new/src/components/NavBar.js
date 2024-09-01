@@ -10,7 +10,8 @@ const NavBar = () => {
   const menuItems = [
     {
       name: 'My Aadhaar',
-      subItems: [
+          subItems: [
+        {name: 'Home', link: '/home'},
         { name: 'Update Your Aadhaar', link: '#' },
         { name: 'Get Aadhaar', link: '#' },
         { name: 'Aadhaar Services', link: '#' },

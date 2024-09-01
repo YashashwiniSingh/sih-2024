@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect } from 'react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 
 const LanguageSelectionPage = () => {
   // JavaScript function to navigate between different language sections
@@ -15,6 +16,10 @@ const LanguageSelectionPage = () => {
     if (targetSection) {
       targetSection.style.display = 'block';
     }
+  };
+
+  const handleLanguageSelection = () => {
+    router.push('/home'); // Redirect to the homepage
   };
 
   // Use an effect to run when the component mounts
@@ -36,29 +41,23 @@ const LanguageSelectionPage = () => {
       {/* Define the section with id 'uidai_1' to be navigated to */}
       <section id="uidai_1" className="page" style={styles.mainSection}>
         <div style={styles.mainContent}>
-          <Image
-            src="aadhar.svg"
-            alt="AADHAAR Logo"
-            width={150} // Specify width
-            height={80} // Specify height
-          />
           <h1>Unique Identification Authority of India</h1>
           <h2 style={styles.h2}>Select your Preferred Language to Enter the Website</h2>
           <p style={styles.p}>वेबसाइट में प्रवेश करने के लिए अपनी पसंदीदा भाषा का चयन करें</p>
           <div style={styles.languageOptions}>
-            <button style={styles.languageButton}>English</button>
-            <button style={styles.languageButton}>हिंदी</button>
-            <button style={styles.languageButton}>অসমীয়া</button>
-            <button style={styles.languageButton}>বাংলা</button>
-            <button style={styles.languageButton}>ಕನ್ನಡ</button>
-            <button style={styles.languageButton}>ગુજરાતી</button>
-            <button style={styles.languageButton}>മലയാളം</button>
-            <button style={styles.languageButton}>मराठी</button>
-            <button style={styles.languageButton}>ଓଡ଼ିଆ</button>
-            <button style={styles.languageButton}>ਪੰਜਾਬੀ</button>
-            <button style={styles.languageButton}>தமிழ்</button>
-            <button style={styles.languageButton}>తెలుగు</button>
-            <button style={styles.languageButton}>اردو</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>English</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>हिंदी</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>অসমীয়া</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>বাংলা</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>ಕನ್ನಡ</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>ગુજરાતી</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>മലയാളം</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>मराठी</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>ଓଡ଼ିଆ</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>ਪੰਜਾਬੀ</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>தமிழ்</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>తెలుగు</button>
+            <button style={styles.languageButton} onClick={handleLanguageSelection}>اردو</button>
           </div>
         </div>
       </section>

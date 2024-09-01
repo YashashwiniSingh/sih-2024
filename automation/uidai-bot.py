@@ -1,21 +1,22 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 import time
 import json
 
-# Configure the WebDriver (use the appropriate driver for your browser)
-service = Service('./chromedriver-win64/chromedriver.exe')
+# Configure WebDriver
+service = Service('./chromedriver')
 driver = webdriver.Chrome(service=service)
 
-# Navigate to the UIDAI website
-driver.get('https://uidai-new.vercel.app')
+# Navigate to the mock website
+driver.get('http://localhost:3000')  # Adjust as necessary
 
-# Initialize ActionChains for capturing mouse movements and keystrokes
+# Initialize ActionChains
 actions = ActionChains(driver)
 
-# Initialize interaction data storage
+# Interaction data storage
 interaction_data = {
     'mouse_movements': [],
     'keystrokes': [],
@@ -23,51 +24,40 @@ interaction_data = {
     'ip_address': ''
 }
 
-# JavaScript code to capture mouse movements and store them in a global array
+# Capture mouse movements
 mouse_move_script = """
     window.mouseMoves = [];
     document.addEventListener('mousemove', function(event) {
         window.mouseMoves.push({x: event.clientX, y: event.clientY, timestamp: Date.now()});
     });
 """
-
-# Execute the script to start capturing mouse movements
 driver.execute_script(mouse_move_script)
 
-# Simulate some interactions to collect data
+# Simulate interactions
 try:
-    # Simulate mouse movement by moving to a certain element (this is just a demonstration)
-    element = driver.find_element_by_tag_name('body')  # Example element
+    element = driver.find_element(By.ID, 'aadhaar-number')  # Example element
     actions.move_to_element(element).perform()
 
     # Simulate keystrokes
-    search_box = driver.find_element_by_name('search')  # Change this selector based on the actual page
+    search_box = driver.find_element(By.ID, 'aadhaar-number')
     search_box.click()
-    actions.send_keys('Aadhaar').perform()
+    actions.send_keys('123456789012').perform()
 
-    # Capture scrolling
-    last_scroll_position = driver.execute_script("return window.pageYOffset;")
-    for _ in range(3):  # Simulate some scrolling
-        driver.execute_script("window.scrollBy(0, 100);")
-        time.sleep(1)
-        current_scroll_position = driver.execute_script("return window.pageYOffset;")
-        interaction_data['scrolling_patterns'].append({
-            'scroll_position': current_scroll_position,
-            'timestamp': time.time()
-        })
+    # Simulate OTP entry and submission
+    otp_field = driver.find_element(By.ID, 'otp')
+    otp_field.send_keys('123456')  # Example OTP
 
-    # Retrieve mouse movement data
+    verify_button = driver.find_element(By.ID, 'verify-download-btn')
+    verify_button.click()
+
+    # Capture mouse movement data
     mouse_moves = driver.execute_script("return window.mouseMoves;")
     interaction_data['mouse_movements'] = mouse_moves
 
-    # Get IP address (this requires server-side support, but simulated here for demo)
-    interaction_data['ip_address'] = driver.execute_script(
-        "return 'Simulated_IP_Address';"
-    )
+    # Get simulated IP address
+    interaction_data['ip_address'] = driver.execute_script("return 'Simulated_IP_Address';")
 
 finally:
-    # Print collected data
+    # Print interaction data
     print(json.dumps(interaction_data, indent=4))
-
-    # Close the browser
     driver.quit()

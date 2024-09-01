@@ -31,3 +31,26 @@ body {
     text-wrap: balance;
   }
 }
+
+/* globals.css */
+
+/* Background for hero section with moving graphics */
+.bg-hero {
+  background-image: url('/images/hero-bg.svg'); /* Replace with your actual image path */
+  animation: moveBackground 20s linear infinite;
+}
+
+@keyframes moveBackground {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Styling for the scrolling content window */
+.announcements {
+  height: 150px; /* Fixed height for scrolling */
+  overflow-y: scroll; /* Scrollbar for content */
+}
