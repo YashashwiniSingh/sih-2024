@@ -120,8 +120,14 @@ const InteractionCapture = () => {
   const [showOtp, setShowOtp] = useState(false);
 
   const showOtpSection = () => {
-    setShowOtp(true);
-    };
+    // Check if the user has moved the mouse enough times to be considered a human
+    if (interactionData.mouseMovements.length > 3) {
+      setShowOtp(true);
+      alert('Verified as human');
+    } else {
+      alert('Please interact with the page to verify you are a human.');
+    }
+  };  
     
   return (
     <div className='interaction-page'>
