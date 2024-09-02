@@ -2,7 +2,7 @@
 'use client'
 import React, { useEffect } from 'react';
 import Image from 'next/image';
-import NavBar from '../components/NavBar'; // Import the NavBar component
+
 
 const HomePage = () => {
   // Add animation to background or content here if necessary
@@ -12,7 +12,6 @@ const HomePage = () => {
 
   return (
     <div className="relative">
-      <NavBar />
       <header className="relative bg-gradient-to-r from-blue-500 to-blue-800 text-white overflow-hidden h-screen flex items-center justify-center">
         <div className="absolute inset-0 opacity-75 z-0">
           {/* Moving background graphics (can use CSS animations here) */}

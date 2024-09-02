@@ -4,7 +4,7 @@ import path from 'path';
 import { parse } from 'json2csv';
 
 let interactionDataBuffer = [];
-let lastWriteTimestamp = Date.now();
+let bufferTimestamp = Date.now();
 
 export default function handler(req, res) {
   if (req.method === 'POST') {
@@ -13,21 +13,17 @@ export default function handler(req, res) {
     // Add interaction data to buffer
     interactionDataBuffer.push(interactionData);
 
-    // Check if 15 seconds have passed since the last write
-    if (Date.now() - lastWriteTimestamp >= 15000) {
+    // Check if 10 seconds have passed
+    if (Date.now() - bufferTimestamp >= 10000) {
       // Prepare CSV data from buffer
       const csvData = interactionDataBuffer.map(data => ({
         mouseMovements: JSON.stringify(data.mouseMovements),
         keystrokes: JSON.stringify(data.keystrokes),
         scrollingPatterns: JSON.stringify(data.scrollingPatterns),
-        ipAddress: data.ipAddress,
-        userAgent: data.userAgent,
-        screenResolution: data.screenResolution,
-        timezone: data.timezone,
-        language: data.language
+        ipAddress: data.ipAddress
       }));
 
-      const fields = ['mouseMovements', 'keystrokes', 'scrollingPatterns', 'ipAddress', 'userAgent', 'screenResolution', 'timezone', 'language'];
+      const fields = ['mouseMovements', 'keystrokes', 'scrollingPatterns', 'ipAddress'];
       const opts = { fields };
 
       try {
@@ -43,7 +39,7 @@ export default function handler(req, res) {
           }
           // Clear buffer and reset timestamp
           interactionDataBuffer = [];
-          lastWriteTimestamp = Date.now();
+          bufferTimestamp = Date.now();
           res.status(200).json({ message: 'Data stored successfully' });
         });
       } catch (err) {

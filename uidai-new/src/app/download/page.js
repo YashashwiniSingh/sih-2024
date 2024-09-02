@@ -5,20 +5,29 @@ import axios from 'axios';
 import Image from 'next/image';
 import styles from './download.module.css';
 
+const throttle = (func, delay) => {
+  let lastCall = 0;
+  return (...args) => {
+    const now = new Date().getTime();
+    if (now - lastCall < delay) {
+      return;
+    }
+    lastCall = now;
+    return func(...args);
+  };
+};
+
 const InteractionCapture = () => {
   const [interactionData, setInteractionData] = useState({
     mouseMovements: [],
     keystrokes: [],
     scrollingPatterns: [],
     ipAddress: '',
-    userAgent: '',
-    screenResolution: '',
-    timezone: '',
-    language: ''
   });
 
   useEffect(() => {
-    const handleMouseMove = (event) => {
+    // Throttled function to handle mouse movements every 100ms
+    const handleMouseMove = throttle((event) => {
       setInteractionData((prevState) => ({
         ...prevState,
         mouseMovements: [
@@ -26,8 +35,9 @@ const InteractionCapture = () => {
           { x: event.clientX, y: event.clientY, timestamp: Date.now() },
         ],
       }));
-    };
+    }, 100); // Throttle to 100ms
 
+    // Capture keystrokes
     const handleKeyDown = (event) => {
       setInteractionData((prevState) => ({
         ...prevState,
@@ -38,6 +48,7 @@ const InteractionCapture = () => {
       }));
     };
 
+    // Capture scrolling patterns
     const handleScroll = () => {
       setInteractionData((prevState) => ({
         ...prevState,
@@ -48,10 +59,12 @@ const InteractionCapture = () => {
       }));
     };
 
+    // Add event listeners
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('scroll', handleScroll);
 
+    // Get client IP address
     axios.get('https://api.ipify.org?format=json').then((response) => {
       setInteractionData((prevState) => ({
         ...prevState,
@@ -59,14 +72,7 @@ const InteractionCapture = () => {
       }));
     });
 
-    setInteractionData((prevState) => ({
-      ...prevState,
-      userAgent: navigator.userAgent,
-      screenResolution: `${window.screen.width}x${window.screen.height}`,
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      language: navigator.language || navigator.userLanguage
-    }));
-
+    // Cleanup function to remove event listeners
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('keydown', handleKeyDown);
@@ -75,19 +81,25 @@ const InteractionCapture = () => {
   }, []);
 
   useEffect(() => {
-    const sendDataInterval = setInterval(() => {
-      const mouseMovements = interactionData.mouseMovements.slice(-150); // Last 150 entries (10 ms each)
-      const dataToSend = {
-        ...interactionData,
-        mouseMovements,
-      };
-
-      axios.post('/api/store-interactions', dataToSend)
+    // Send mouse movement data every 100ms
+    const mouseMovementInterval = setInterval(() => {
+      axios.post('/api/store-interactions', interactionData)
         .then((response) => {
-          console.log('Interaction data sent:', response.data);
+          console.log('Mouse movements sent:', response.data);
         })
         .catch((error) => {
-          console.error('Error sending interaction data:', error);
+          console.error('Error sending mouse movements:', error);
+        });
+    }, 100); // 100ms
+
+    // Send all interaction data every 30 seconds
+    const allDataInterval = setInterval(() => {
+      axios.post('/api/store-interactions', interactionData)
+        .then((response) => {
+          console.log('Data stored successfully:', response.data);
+        })
+        .catch((error) => {
+          console.error('Error storing data:', error);
         });
 
       // Reset interaction data to start fresh for the next interval
@@ -96,23 +108,27 @@ const InteractionCapture = () => {
         keystrokes: [],
         scrollingPatterns: [],
         ipAddress: prevState.ipAddress, // Keep IP address
-        userAgent: prevState.userAgent,
-        screenResolution: prevState.screenResolution,
-        timezone: prevState.timezone,
-        language: prevState.language
       }));
-    }, 15000); // 15 seconds
+    }, 30000); // 30 seconds
 
     return () => {
-      clearInterval(sendDataInterval);
+      clearInterval(mouseMovementInterval);
+      clearInterval(allDataInterval); // Cleanup intervals on component unmount
     };
   }, [interactionData]);
 
   const [showOtp, setShowOtp] = useState(false);
 
   const showOtpSection = () => {
-    setShowOtp(true);
-  };    
+    // Check if the user has moved the mouse enough times to be considered a human
+    if (interactionData.mouseMovements.length > 3) {
+      setShowOtp(true);
+      alert('Verified as human');
+    } else {
+      alert('Please interact with the page to verify you are a human.');
+    }
+  };  
+    
   return (
     <div className='interaction-page'>
       <header className={styles.header}>

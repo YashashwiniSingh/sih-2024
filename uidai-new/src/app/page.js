@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 
 const LanguageSelectionPage = () => {
+  const router = useRouter();
   // JavaScript function to navigate between different language sections
   const navigate = (sectionId) => {
     const pages = document.querySelectorAll('.page');
