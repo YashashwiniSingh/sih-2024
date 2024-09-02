@@ -209,4 +209,4 @@ const InteractionCapture = () => {
 };
   
 
-export default InteractionCapture;;
+export default InteractionCapture;
